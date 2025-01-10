@@ -84,10 +84,10 @@ jobs:
           context: ./nginx/
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_gateway:latest
-          
+
   telegram-notify:
     runs-on: ubuntu-latest
-    needs: auto_tests
+    needs: [tests, build_backend, build_frontend, build_gateway]  # Зависит от всех jobs
     steps:
     - name: Send Telegram notification
       uses: appleboy/telegram-action@master
@@ -95,7 +95,8 @@ jobs:
         to: ${{ secrets.TELEGRAM_TO_CHAT_ID }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
         message: |
-          Deployment of ${{ github.repository }} completed.
-          Author: ${{ github.actor }}
-          Latest commit message: ${{ github.event.commits[0].message }}
-          View commit: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+          🚀 Deployment of ${{ github.repository }} completed.
+          ✅ All jobs passed:
+          👤 Author: ${{ github.actor }}
+          📝 Latest commit message: ${{ github.event.commits[0].message }}
+          🔗 View commit: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
