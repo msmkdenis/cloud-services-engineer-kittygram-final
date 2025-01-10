@@ -1,0 +1,66 @@
+services:
+  gateway:
+    image: msmkd/kittygram_gateway:latest
+    container_name: gateway
+    ports:
+      - '8000:80'
+      - '80:80'
+    restart: always
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - kittygram-network
+    volumes:
+      - static:/var/html/backend
+      - media:/var/html/media
+      - media:/app/media
+      - static:/var/html/static
+
+  backend:
+    image: msmkd/kittygram_backend:latest
+    container_name: backend
+    restart: always
+    env_file: .env
+    networks:
+      - kittygram-network
+    volumes:
+      - static:/app/collected_static
+      - media:/app/media
+    depends_on:
+      - postgres
+    
+  frontend:
+    image: msmkd/kittygram_frontend:latest
+    container_name: frontend
+    restart: always
+    networks:
+      - kittygram-network
+    volumes:
+      - static:/app/build
+    
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: always
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - kittygram-network
+
+volumes:
+  static:
+  media:
+  pg_data:
+
+networks:
+  kittygram-network:
+    driver: bridge
+

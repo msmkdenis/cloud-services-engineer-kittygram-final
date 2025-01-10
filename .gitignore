@@ -1,2 +1,7 @@
-
+.env
 .DS_Store
+
+# IDE files and directories
+.idea/
+.vscode/*.json
+!.vscode/*.example.json
