@@ -8,6 +8,8 @@ RUN pip install -r requirements.txt --no-cache-dir
 
 COPY . .
 
+RUN chmod +x entrypoint.sh
+
 EXPOSE 8000
 
 CMD ["./entrypoint.sh"]
