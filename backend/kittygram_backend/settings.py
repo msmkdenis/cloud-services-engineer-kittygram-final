@@ -9,7 +9,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", default=get_random_secret_key())
 
 DEBUG = os.environ.get("DEBUG", False) in ("true", "True", "1")
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = ['*']
 
 STATIC_ROOT = "/app/collected_static"
 
