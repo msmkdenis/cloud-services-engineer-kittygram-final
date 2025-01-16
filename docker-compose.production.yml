@@ -3,7 +3,6 @@ services:
     image: msmkd/kittygram_gateway:latest
     container_name: gateway
     ports:
-      - '8000:80'
       - '80:80'
     restart: always
     depends_on:
@@ -12,8 +11,6 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - static:/var/html/backend
-      - media:/var/html/media
       - media:/app/media
       - static:/var/html/static
 

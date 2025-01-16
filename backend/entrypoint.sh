@@ -8,5 +8,5 @@ python manage.py collectstatic --noinput || exit 1
 echo "applu migrations"
 python manage.py migrate || exit 1
 
-echo "run server on 0.0.0.0:8000"
-python manage.py runserver 0.0.0.0:8000
+echo "run server on 0.0.0.0:80"
+python manage.py runserver 0.0.0.0:80
