@@ -1,6 +1,6 @@
 services:
   backend:
-    image: kittygram_backend
+    image: msmkd/kittygram_backend
     container_name: backend
     restart: always
     env_file: .env
@@ -13,7 +13,7 @@ services:
       - postgres
 
   frontend:
-    image: kittygram_frontend
+    image: msmkd/kittygram_frontend
     container_name: frontend
     restart: always
     networks:
@@ -22,7 +22,7 @@ services:
       - static:/staticfiles/frontend  # Статика фронтенда
 
   gateway:
-    image: kittygram_gateway
+    image: msmkd/kittygram_gateway
     container_name: gateway
     ports:
       - '80:80'
