@@ -1,28 +1,30 @@
+version: '3.8'
+
 services:
   backend:
-    image: msmkd/kittygram_backend:latest
+    image: kittygram_backend
     container_name: backend
     restart: always
     env_file: .env
     networks:
       - kittygram-network
     volumes:
-      - static:/backend_static
-      - media:/app/media
+      - static:/staticfiles/backend  # Статика бэкенда
+      - media:/app/media             # Медиафайлы
     depends_on:
       - postgres
 
   frontend:
-    image: msmkd/kittygram_frontend:latest
+    image: kittygram_frontend
     container_name: frontend
     restart: always
     networks:
       - kittygram-network
     volumes:
-      - static:/staticfiles  # Исправленный путь
+      - static:/staticfiles/frontend  # Статика фронтенда
 
   gateway:
-    image: msmkd/kittygram_gateway:latest
+    image: kittygram_gateway
     container_name: gateway
     ports:
       - '80:80'
@@ -33,9 +35,9 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - static:/staticfiles
-      - media:/app/media
-    
+      - static:/staticfiles  # Статика для Nginx
+      - media:/app/media     # Медиафайлы для Nginx
+
   postgres:
     image: postgres:13
     container_name: postgres
@@ -48,16 +50,15 @@ services:
     restart: always
     env_file: .env
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data  # Данные PostgreSQL
     networks:
       - kittygram-network
 
 volumes:
-  pg_data:
-  static:
-  media:
+  pg_data:  # Volume для PostgreSQL
+  static:   # Volume для статики
+  media:    # Volume для медиафайлов
 
 networks:
   kittygram-network:
     driver: bridge
-
