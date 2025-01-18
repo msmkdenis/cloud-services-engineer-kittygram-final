@@ -1,4 +1,26 @@
 services:
+  backend:
+    image: msmkd/kittygram_backend:latest
+    container_name: backend
+    restart: always
+    env_file: .env
+    networks:
+      - kittygram-network
+    volumes:
+      - backend_static:/app/collected_static
+      - media:/app/media
+    depends_on:
+      - postgres
+
+  frontend:
+    image: msmkd/kittygram_frontend:latest
+    container_name: frontend
+    restart: always
+    networks:
+      - kittygram-network
+    volumes:
+      - frontend_static:/app/build
+
   gateway:
     image: msmkd/kittygram_gateway:latest
     container_name: gateway
@@ -11,30 +33,9 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - media:/app/media
-      - static:/var/html/static
-
-  backend:
-    image: msmkd/kittygram_backend:latest
-    container_name: backend
-    restart: always
-    env_file: .env
-    networks:
-      - kittygram-network
-    volumes:
-      - static:/app/collected_static
-      - media:/app/media
-    depends_on:
-      - postgres
-    
-  frontend:
-    image: msmkd/kittygram_frontend:latest
-    container_name: frontend
-    restart: always
-    networks:
-      - kittygram-network
-    volumes:
-      - static:/app/build
+      - frontend_static:/var/html/static
+      - backend_static:/var/html/backend
+      - media:/var/html/media
     
   postgres:
     image: postgres:13
@@ -53,7 +54,8 @@ services:
       - kittygram-network
 
 volumes:
-  static:
+  frontend_static:
+  backend_static:
   media:
   pg_data:
 
