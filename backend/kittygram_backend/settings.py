@@ -96,7 +96,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/staticfiles/backend/'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/app/media/'  # Исправленный путь
+MEDIA_ROOT = '/app/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
