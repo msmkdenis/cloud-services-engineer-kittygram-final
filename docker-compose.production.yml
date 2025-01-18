@@ -19,7 +19,7 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - static:/frontend_static
+      - static:/staticfiles  # Исправленный путь
 
   gateway:
     image: msmkd/kittygram_gateway:latest
