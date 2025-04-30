@@ -2,11 +2,11 @@
 
 echo "Current directory contents: $(ls -la)"
 
-echo "collect static"
+echo "collectstatic"
 python manage.py collectstatic --noinput || exit 1
 
-echo "applu migrations"
+echo "migrate"
 python manage.py migrate || exit 1
 
-echo "run server on 0.0.0.0:80"
-python manage.py runserver 0.0.0.0:80
+echo "runserver"
+python manage.py runserver 0.0.0.0:8000
