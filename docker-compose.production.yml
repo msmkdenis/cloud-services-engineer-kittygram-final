@@ -34,7 +34,7 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - static:/staticfiles  # Статика для Nginx
+      - static:/staticfiles/  # Статика для Nginx
       - media:/app/media     # Медиафайлы для Nginx
 
   postgres:
