@@ -1,4 +1,4 @@
-name: Main Workflow
+name: Deploy
 
 on:
   push:
@@ -115,9 +115,9 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         script: |
           cd ~/kittygram
-          docker-compose docker-compose.production.yml pull
-          docker-compose docker-compose.production.yml down
-          docker-compose docker-compose.production.yml up -d
+          docker-compose -f docker-compose.production.yml pull
+          docker-compose -f docker-compose.production.yml down
+          docker-compose -f docker-compose.production.yml up -d
 
   auto_tests:
     runs-on: ubuntu-latest
