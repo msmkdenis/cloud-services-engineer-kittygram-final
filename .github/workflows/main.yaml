@@ -115,9 +115,9 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         script: |
           cd ~/kittygram
-          docker compose docker-compose.production.yml pull
-          docker compose docker-compose.production.yml down
-          docker compose docker-compose.production.yml up -d
+          docker-compose -f docker-compose.production.yml pull
+          docker-compose -f docker-compose.production.yml down
+          docker-compose -f docker-compose.production.yml up -d
           docker exec backend python manage.py collectstatic --noinput
 
   auto_tests:
