@@ -27,6 +27,12 @@ resource "yandex_vpc_security_group" "infra_sg" {
     v4_cidr_blocks = ["0.0.0.0/0"]
   }
 
+    ingress {
+    protocol       = "TCP"
+    port           = 80
+    v4_cidr_blocks = ["0.0.0.0/0"]
+  }
+
   ingress {
     protocol       = "TCP"
     port           = 22
