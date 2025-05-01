@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   backend:
     image: msmkd/kittygram_backend
@@ -7,8 +9,8 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - static:/backend_static
-      - media:/media_static
+      - backend_static:/backend_static     # Django STATIC_ROOT
+      - media:/media_static                # Django MEDIA_ROOT
     depends_on:
       - postgres
 
@@ -19,14 +21,13 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - frontend:/app/build
+      - frontend:/app/build                # Фронтенд билд (index.html и статика)
 
   gateway:
     image: msmkd/kittygram_gateway
     container_name: gateway
     ports:
       - '80:80'
-      - '8000:80'    
     restart: always
     depends_on:
       - backend
@@ -34,9 +35,9 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - static:/static
-      - media:/media_static
-      - frontend:/frontend
+      - backend_static:/static/collected_static   # Django статика (alias: /static/)
+      - media:/media_static                       # Медиафайлы
+      - frontend:/frontend                        # Фронтенд (root /)
 
   postgres:
     image: postgres:13
@@ -50,15 +51,15 @@ services:
     restart: always
     env_file: .env
     volumes:
-      - pg_data:/var/lib/postgresql/data  # Данные PostgreSQL
+      - pg_data:/var/lib/postgresql/data
     networks:
       - kittygram-network
 
 volumes:
-  pg_data:    # Для базы данных
-  static:     # Для статики
-  media:      # Для медиафайлов
-  frontend:   # Для фронтенда
+  pg_data:
+  backend_static:    # Только Django-статика
+  media:             # Медиафайлы
+  frontend:          # Только фронтенд
 
 networks:
   kittygram-network:
