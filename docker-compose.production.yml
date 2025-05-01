@@ -7,8 +7,8 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - static:/backend_static
-      - media:/media_static
+      - static:/app/collected_static/
+      - media:/app/media/    
     depends_on:
       - postgres
 
@@ -19,7 +19,7 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - frontend:/app/build
+      - frontend_build:/app/build/
 
   gateway:
     image: msmkd/kittygram_gateway
@@ -31,12 +31,10 @@ services:
     depends_on:
       - backend
       - frontend
-    networks:
-      - kittygram-network
     volumes:
-      - static:/static
-      - media:/media_static
-      - frontend:/frontend
+      - frontend_build:/usr/share/nginx/html/
+      - static:/var/html/static/
+      - media:/var/html/media/
 
   postgres:
     image: postgres:13
@@ -55,10 +53,10 @@ services:
       - kittygram-network
 
 volumes:
-  pg_data:    # Для базы данных
-  static:     # Для статики
-  media:      # Для медиафайлов
-  frontend:   # Для фронтенда
+  pg_data:
+  static:
+  media:
+  frontend_build:
 
 networks:
   kittygram-network:
