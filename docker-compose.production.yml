@@ -20,7 +20,7 @@ services:
     env_file: .env
     restart: always
     depends_on:
-      - kitty_postgres
+      - postgres
     volumes:
       - static:/app/collected_static/
       - media:/app/media/    
@@ -42,5 +42,5 @@ services:
       - static:/var/html/static/
       - media:/var/html/media/
     depends_on:
-      - kitty_backend
-      - kitty_frontend
+      - backend
+      - frontend
