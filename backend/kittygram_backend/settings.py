@@ -92,7 +92,7 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/backend_static/collected_static/'  # внутри контейнера Django
+STATIC_ROOT = '/static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/media_static/'
