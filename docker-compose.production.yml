@@ -1,65 +1,46 @@
-services:
-  backend:
-    image: msmkd/kittygram_backend
-    container_name: backend
-    restart: always
-    env_file: .env
-    networks:
-      - kittygram-network
-    volumes:
-      - static:/app/collected_static/
-      - media:/app/media/  
-    depends_on:
-      - postgres
-
-  frontend:
-    image: msmkd/kittygram_frontend
-    container_name: frontend
-    restart: always
-    networks:
-      - kittygram-network
-    volumes:
-      - frontend_build:/app/build/
-
-  gateway:
-    image: msmkd/kittygram_gateway
-    container_name: gateway
-    ports:
-      - '80:80'
-      - '8000:80'    
-    restart: always
-    depends_on:
-      - backend
-      - frontend
-    networks:
-      - kittygram-network
-    volumes:
-      - frontend_build:/usr/share/nginx/html/
-      - static:/var/html/static/
-      - media:/var/html/media/
-
-  postgres:
-    image: postgres:17
-    container_name: postgres
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    restart: always
-    env_file: .env
-    volumes:
-      - pg_data:/var/lib/postgresql/data/
-    networks:
-      - kittygram-network
-
 volumes:
   pg_data:
   static:
   media:
   frontend_build:
 
-networks:
-  kittygram-network:
-    driver: bridge
+services:
+  postgres:
+    image: postgres:13.10
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+
+  backend:
+    image: msmkd/kittygram_backend:latest
+    env_file: .env
+    restart: always
+    depends_on:
+      - kitty_postgres
+    volumes:
+      - static:/app/collected_static/
+      - media:/app/media/    
+
+  frontend:
+    image: msmkd/kittygram_frontend:latest
+    env_file: .env
+    restart: always
+    volumes:
+      - frontend_build:/app/build/
+  
+  gateway:
+    image: msmkd/kittygram_gateway:latest
+    ports:
+      - "80:80"
+    restart: always
+    volumes:
+      - frontend_build:/usr/share/nginx/html/
+      - static:/var/html/static/
+      - media:/var/html/media/
+    depends_on:
+      - kitty_backend
+      - kitty_frontend
