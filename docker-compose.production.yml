@@ -19,7 +19,7 @@ services:
     networks:
       - kittygram-network
     volumes:
-      - frontend:/app/build
+      - static:/app/build
 
   gateway:
     image: msmkd/kittygram_gateway
@@ -36,7 +36,6 @@ services:
     volumes:
       - static:/static
       - media:/media_static
-      - frontend:/frontend
 
   postgres:
     image: postgres:13
