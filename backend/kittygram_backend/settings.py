@@ -93,7 +93,7 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/backend_static/collected_static/'
+STATIC_ROOT = '/backend_static/'  # Корень volume для статики
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/media_static/'
