@@ -1,6 +1,7 @@
 services:
   backend:
-    image: msmkd/kittygram_backend
+    build:
+      context: ./backend
     container_name: backend
     restart: always
     env_file: .env
@@ -13,7 +14,8 @@ services:
       - postgres
 
   frontend:
-    image: msmkd/kittygram_frontend
+    build:
+      context: ./frontend
     container_name: frontend
     restart: always
     networks:
@@ -22,11 +24,12 @@ services:
       - frontend_build:/app/build/
 
   gateway:
-    image: msmkd/kittygram_gateway
+    build:
+      context: ./nginx
     container_name: gateway
     ports:
       - '80:80'
-      - '8000:80'    
+      - '9000:80'    
     restart: always
     depends_on:
       - backend
