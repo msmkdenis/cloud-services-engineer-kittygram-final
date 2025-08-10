@@ -102,6 +102,11 @@ jobs:
           # Добавляем хост в known_hosts, чтобы не было вопросов при первом подключении
           ssh-keyscan -H ${{ secrets.HOST }} >> "$HOME/.ssh/known_hosts"
 
+      - name: Debug key
+        run: |
+          ls -la $HOME/.ssh/id_ed25519
+          wc -c $HOME/.ssh/id_ed25519
+
       # 2. Копируем файлы через rsync (быстрее и удобнее scp)
       - name: Copy files to server
         run: |
