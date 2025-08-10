@@ -88,61 +88,48 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [build_backend, build_frontend, build_gateway]
+
     steps:
-    - name: Check out repository code
-      uses: actions/checkout@v3
-    - name: Setup SSH key
-      run: |
-        mkdir -p "$HOME/.ssh"
-        echo "${{ secrets.SSH_KEY }}" > "$HOME/.ssh/id_ed25519"
-        chmod 600 "$HOME/.ssh/id_ed25519"
-    - name: Test SSH connection
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key_path: ${{ env.HOME }}/.ssh/id_ed25519
-        debug: true  # Включить детальные логи
-        script: |
-          echo "Проверка ключа:"
-          echo "$(echo '***' | head -c 20)..."  # Частичный вывод без риска
-          ls -la ~/.ssh
-          stat -c "%a %n" ~/.ssh/*
-          echo "Ключи в authorized_keys:"
-          cut -c 1-80 ~/.ssh/authorized_keys  # Безопасный вывод
-    - name: Copy docker-compose.yml via ssh
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key_path: ${{ env.HOME }}/.ssh/id_ed25519
-        source: "docker-compose.production.yml"
-        target: "/home/${{ secrets.USER }}/kittygram"
-    - name: Copy .env file via ssh
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key_path: ${{ env.HOME }}/.ssh/id_ed25519
-        source: ".env"
-        target: "/home/${{ secrets.USER }}/kittygram"
-    - name: Executing remote ssh commands to deploy
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key_path: ${{ env.HOME }}/.ssh/id_ed25519
-        script: |
-          cd ~/kittygram
-          docker-compose -f docker-compose.production.yml pull
-          docker-compose -f docker-compose.production.yml down
-          docker-compose -f docker-compose.production.yml up -d
+      - name: Check out repository code
+        uses: actions/checkout@v3
 
-          echo "Waiting 30 sec for the PostgreSQL container..."
-          sleep 30
+      # 1. Устанавливаем ключ и настраиваем SSH
+      - name: Setup SSH key & known_hosts
+        run: |
+          mkdir -p "$HOME/.ssh"
+          echo "${{ secrets.SSH_KEY }}" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          # Добавляем хост в known_hosts, чтобы не было вопросов при первом подключении
+          ssh-keyscan -H ${{ secrets.HOST }} >> "$HOME/.ssh/known_hosts"
 
-          docker-compose -f docker-compose.production.yml exec -T backend python manage.py migrate
-          docker-compose -f docker-compose.production.yml exec -T backend python manage.py collectstatic --noinput
+      # 2. Копируем файлы через rsync (быстрее и удобнее scp)
+      - name: Copy files to server
+        run: |
+          rsync -avz --progress \
+            -e "ssh -i $HOME/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
+            docker-compose.production.yml .env \
+            ${{ secrets.USER }}@${{ secrets.HOST }}:~/kittygram/
+
+      # 3. Выполняем команды на сервере
+      - name: Deploy via SSH
+        run: |
+          ssh -i "$HOME/.ssh/id_ed25519" \
+              -o StrictHostKeyChecking=no \
+              ${{ secrets.USER }}@${{ secrets.HOST }} \
+              bash -c '
+                set -e
+                cd ~/kittygram
+
+                docker-compose -f docker-compose.production.yml pull
+                docker-compose -f docker-compose.production.yml down
+                docker-compose -f docker-compose.production.yml up -d
+
+                echo "Waiting 30 sec for the PostgreSQL container..."
+                sleep 30
+
+                docker-compose -f docker-compose.production.yml exec -T backend python manage.py migrate
+                docker-compose -f docker-compose.production.yml exec -T backend python manage.py collectstatic --noinput
+              '
 
   auto_tests:
     runs-on: ubuntu-latest
