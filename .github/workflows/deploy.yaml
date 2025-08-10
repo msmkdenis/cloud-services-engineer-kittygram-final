@@ -97,14 +97,14 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
+        debug: true  # Включить детальные логи
         script: |
-          echo "Подключение к хосту: ${{ secrets.HOST }}"
-          echo "Имя пользователя: ${{ secrets.USER }}"
-          echo "Хеш SSH-ключа (SHA-256): $(echo '${{ secrets.SSH_KEY }}' | sha256sum | cut -d ' ' -f1)"
-          echo "Проверка прав .ssh/authorized_keys:"
+          echo "Проверка ключа:"
+          echo "$(echo '***' | head -c 20)..."  # Частичный вывод без риска
           ls -la ~/.ssh
-          cat ~/.ssh/authorized_keys
-          echo "Успешное подключение!"
+          stat -c "%a %n" ~/.ssh/*
+          echo "Ключи в authorized_keys:"
+          cut -c 1-80 ~/.ssh/authorized_keys  # Безопасный вывод
     - name: Copy docker-compose.yml via ssh
       uses: appleboy/scp-action@master
       with:
