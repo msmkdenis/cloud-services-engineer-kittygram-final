@@ -91,6 +91,20 @@ jobs:
     steps:
     - name: Check out repository code
       uses: actions/checkout@v3
+    - name: Test SSH connection
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        script: |
+          echo "Подключение к хосту: ${{ secrets.HOST }}"
+          echo "Имя пользователя: ${{ secrets.USER }}"
+          echo "Хеш SSH-ключа (SHA-256): $(echo '${{ secrets.SSH_KEY }}' | sha256sum | cut -d ' ' -f1)"
+          echo "Проверка прав .ssh/authorized_keys:"
+          ls -la ~/.ssh
+          cat ~/.ssh/authorized_keys
+          echo "Успешное подключение!"
     - name: Copy docker-compose.yml via ssh
       uses: appleboy/scp-action@master
       with:
