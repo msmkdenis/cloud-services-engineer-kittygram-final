@@ -93,15 +93,15 @@ jobs:
       uses: actions/checkout@v3
     - name: Setup SSH key
       run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
+        mkdir -p "$HOME/.ssh"
+        echo "${{ secrets.SSH_KEY }}" > "$HOME/.ssh/id_ed25519"
+        chmod 600 "$HOME/.ssh/id_ed25519"
     - name: Test SSH connection
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        key_path: ~/.ssh/id_ed25519
+        key_path: ${{ env.HOME }}/.ssh/id_ed25519
         debug: true  # Включить детальные логи
         script: |
           echo "Проверка ключа:"
@@ -115,7 +115,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        key_path: ~/.ssh/id_ed25519
+        key_path: ${{ env.HOME }}/.ssh/id_ed25519
         source: "docker-compose.production.yml"
         target: "/home/${{ secrets.USER }}/kittygram"
     - name: Copy .env file via ssh
@@ -123,7 +123,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        key_path: ~/.ssh/id_ed25519
+        key_path: ${{ env.HOME }}/.ssh/id_ed25519
         source: ".env"
         target: "/home/${{ secrets.USER }}/kittygram"
     - name: Executing remote ssh commands to deploy
@@ -131,7 +131,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        key_path: ~/.ssh/id_ed25519
+        key_path: ${{ env.HOME }}/.ssh/id_ed25519
         script: |
           cd ~/kittygram
           docker-compose -f docker-compose.production.yml pull
