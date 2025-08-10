@@ -91,12 +91,17 @@ jobs:
     steps:
     - name: Check out repository code
       uses: actions/checkout@v3
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
     - name: Test SSH connection
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
+        key_path: ~/.ssh/id_ed25519
         debug: true  # Включить детальные логи
         script: |
           echo "Проверка ключа:"
@@ -110,7 +115,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
+        key_path: ~/.ssh/id_ed25519
         source: "docker-compose.production.yml"
         target: "/home/${{ secrets.USER }}/kittygram"
     - name: Copy .env file via ssh
@@ -118,7 +123,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
+        key_path: ~/.ssh/id_ed25519
         source: ".env"
         target: "/home/${{ secrets.USER }}/kittygram"
     - name: Executing remote ssh commands to deploy
@@ -126,7 +131,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
+        key_path: ~/.ssh/id_ed25519
         script: |
           cd ~/kittygram
           docker-compose -f docker-compose.production.yml pull
